@@ -19,6 +19,17 @@ describe "File.open" do
     @fh.close if @fh and not @fh.closed?
   end
 
+  # kept dir creation logic within example since so far it's only needed here.
+  it "opens a directory for reading" do
+    begin
+      path = tmp('test_dir')
+      Dir.mkdir(path)
+      lambda { File.open(path) {} }.should_not raise_error(Errno::EACCES)
+    ensure
+      Dir.rmdir(path) if File.directory?(path)
+    end
+  end
+
   it "with block does not raise error when file is closed inside the block" do
     lambda {
       @fh = File.open(@file) { |fh| fh.close; fh }
